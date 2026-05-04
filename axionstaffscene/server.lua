@@ -15,7 +15,7 @@ local function sendNotification(src, message, notificationType)
     end
 
     if AxionStaffSceneConfig.NotificationType == 'axionnotification' and GetResourceState('AxionNotifications') == 'started' then
-        TriggerClientEvent('AxionNotifications:Client:Notify', src, message, notificationType, 5000)
+        exports['AxionNotifications']:Notify(src, message, notificationType, 5000)
     else
         TriggerClientEvent('chat:addMessage', src, {
             color = typeColor,

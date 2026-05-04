@@ -25,7 +25,7 @@ local function createBlips()
         SetBlipSprite(centerBlip, AxionStaffSceneConfig.SceneBlip.sprite)
         SetBlipColour(centerBlip, AxionStaffSceneConfig.SceneBlip.color)
         SetBlipScale(centerBlip, AxionStaffSceneConfig.SceneBlip.scale)
-        SetBlipAsShortRange(centerBlip, false)
+        SetBlipAsShortRange(centerBlip, true)
 
         BeginTextCommandSetBlipName('STRING')
         AddTextComponentString(AxionStaffSceneConfig.SceneBlip.name .. ' #' .. id)
@@ -61,9 +61,11 @@ local function drawScreenText(text)
     SetTextOutline()
     SetTextCentre(true)
 
-    BeginTextCommandDisplayText('STRING')
+    SetTextWrap(0.05, 0.95)
+
+    BeginTextCommandDisplayText("STRING")
     AddTextComponentSubstringPlayerName(text)
-    EndTextCommandDisplayText(0.5, 0.88)
+    EndTextCommandDisplayText(0.5, 0.5)
 end
 
 CreateThread(function()

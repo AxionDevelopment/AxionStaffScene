@@ -1,6 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 
+name 'AxionStaffScene'
 author 'AxionDevelopment | SpunkyDunkie'
 description 'Axion Staff Scene'
 version '1.0.0'
