@@ -182,6 +182,7 @@ CreateThread(function()
             SetEntityMaxHealth(ped, 200)
         else 
             if wasInScene then
+                ResetEntityAlpha(ped)
                 SetEntityInvincible(ped, false)
                 SetEntityProofs(ped, false, false, false, false, false, false, false, false)
                 SetBlockingOfNonTemporaryEvents(ped, false)
