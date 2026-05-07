@@ -12,6 +12,9 @@ AxionStaffSceneConfig.NotificationType = 'axionnotification'
 -- Default radius for new staff scenes.
 AxionStaffSceneConfig.DefaultRadius = 75.0
 
+-- Default radius for new staff scenes.
+AxionStaffSceneConfig.ViewDistance = 300.0
+
 -- Blip settings for staff scenes.
 AxionStaffSceneConfig.SceneBlip = {
     sprite = 161,

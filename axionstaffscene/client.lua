@@ -33,7 +33,10 @@ local function createBlips()
 
         sceneBlips[id] = {
             center = centerBlip,
-            radius = radiusBlip
+            radius = radiusBlip,
+            x = coords.x,
+            y = coords.y,
+            z = coords.z
         }
     end
 end
@@ -81,6 +84,22 @@ CreateThread(function()
         local ped = PlayerPedId()
         local playerCoords = GetEntityCoords(ped)
         local inScene = false
+
+        for _, blipData in pairs(sceneBlips) do
+            local playerPos = GetEntityCoords(PlayerPedId())
+            local distance = #(playerPos - vector3(blipData.x, blipData.y, blipData.z))
+
+            if distance > AxionStaffSceneConfig.ViewDistance then
+                SetBlipDisplay(blipData.radius, 0)
+                SetBlipDisplay(blipData.center, 0)
+            else
+                SetBlipDisplay(blipData.radius, 2)
+                SetBlipDisplay(blipData.center, 2)
+            end
+        end
+
+
+
 
         for _, scene in pairs(activeScenes) do
             local sceneCoords = vector3(scene.coords.x, scene.coords.y, scene.coords.z)
