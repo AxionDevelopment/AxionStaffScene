@@ -35,7 +35,7 @@ RegisterCommand('staffscene', function(source, args)
         return
     end
 
-    local radius = tonumber(args[1]) or AxionStaffSceneConfig.DefaultRadius
+    local radius = tonumber(string.format("%.1f", tonumber(args[1]))) or AxionStaffSceneConfig.DefaultRadius
 
     TriggerClientEvent('axionstaffscene:client:createScene', source, radius)
 end, false)

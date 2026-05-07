@@ -60,13 +60,20 @@ local function drawScreenText(text)
     SetTextColour(255, 255, 255, 255)
     SetTextOutline()
     SetTextCentre(true)
+    
+    SetTextWrap(0.0, 1.0) 
 
-    SetTextWrap(0.05, 0.95)
-
-    BeginTextCommandDisplayText("STRING")
-    AddTextComponentSubstringPlayerName(text)
+    BeginTextCommandDisplayText("CELL_EMAIL_BCON")
+    
+    -- Split the string into chunks of 99 characters
+    for i = 1, #text, 99 do
+        AddTextComponentSubstringPlayerName(string.sub(text, i, i + 98))
+    end
+    
     EndTextCommandDisplayText(0.5, 0.5)
 end
+
+local msgTimer = true;
 
 CreateThread(function()
     while true do
@@ -88,6 +95,40 @@ CreateThread(function()
         if inScene then
             sleep = 0
             drawScreenText(AxionStaffSceneConfig.ScreenText)
+
+            -- Disable combat and weapon controls
+            DisableControlAction(0, 24, true) -- Left Click / Attack
+            DisableControlAction(0, 25, true) -- Right Click / Aim
+            DisableControlAction(0, 47, true) -- G / Weapon Special (Grenades)
+            DisableControlAction(0, 58, true) -- G / Aiming / Throwing
+            DisableControlAction(0, 140, true) -- R / Light Melee
+            DisableControlAction(0, 141, true) -- Q / Heavy Melee
+            DisableControlAction(0, 142, true) -- Left Click / Melee Attack
+            DisableControlAction(0, 257, true) -- Fire (Vehicle/Foot)
+            DisableControlAction(0, 263, true) -- Melee Attack 1
+            DisableControlAction(0, 264, true) -- Melee Attack 2
+
+            -- Disable player firing altogether
+            if IsPedArmed(ped, 6) then
+                DisablePlayerFiring(ped, true)
+            end
+
+            if IsDisabledControlPressed(0, 24) or IsDisabledControlPressed(0, 25) or IsDisabledControlPressed(0, 47) or IsDisabledControlPressed(0, 58) or IsDisabledControlPressed(0, 140) or IsDisabledControlPressed(0, 141) or IsDisabledControlPressed(0, 142) or IsDisabledControlPressed(0, 257) or IsDisabledControlPressed(0, 263) or IsDisabledControlPressed(0, 264) then
+                if (msgTimer) then
+                    if AxionStaffSceneConfig.NotificationType == 'axionnotification' and GetResourceState('AxionNotifications') == 'started' then
+                        exports['AxionNotifications']:Notify('You cannot use weapons in a staff scene area.', 'error', 5000)
+                    else
+                        TriggerEvent('chat:addMessage', {
+                            color = {255, 0, 0},
+                            args = {'AxionStaffScene', 'You cannot use weapons in a staff scene area.'}
+                        })
+                    end
+                    msgTimer = false
+                    SetTimeout(5000, function()
+                        msgTimer = true
+                    end)
+                end
+            end
         end
 
         Wait(sleep)
