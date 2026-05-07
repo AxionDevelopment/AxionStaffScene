@@ -31,4 +31,4 @@ AxionStaffSceneConfig.RadiusBlip = {
 
 -- Text to display when a player is inside a staff scene area.
 -- Can use \n for new lines.
-AxionStaffSceneConfig.ScreenText = 'You are inside a staff scene area.\nYou are not allowed to roleplay here.\nPlease leave the area unless involved in the scene.'
+AxionStaffSceneConfig.ScreenText = 'You are inside a staff scene area.\nYou are not allowed to roleplay here.\nPlease leave the area unless involved in the scene.\nWeapons and combat are prohibited.'

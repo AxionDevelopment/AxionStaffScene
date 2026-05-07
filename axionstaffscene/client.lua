@@ -78,17 +78,17 @@ end
 
 local msgTimer = true;
 
+local wasInScene = false
+
 CreateThread(function()
     while true do
-        local sleep = 1000
+        local sleep = 500
         local ped = PlayerPedId()
         local playerCoords = GetEntityCoords(ped)
         local inScene = false
 
         for _, blipData in pairs(sceneBlips) do
-            local playerPos = GetEntityCoords(PlayerPedId())
-            local distance = #(playerPos - vector3(blipData.x, blipData.y, blipData.z))
-
+            local distance = #(playerCoords - vector3(blipData.x, blipData.y, blipData.z))
             if distance > AxionStaffSceneConfig.ViewDistance then
                 SetBlipDisplay(blipData.radius, 0)
                 SetBlipDisplay(blipData.center, 0)
@@ -98,13 +98,9 @@ CreateThread(function()
             end
         end
 
-
-
-
         for _, scene in pairs(activeScenes) do
             local sceneCoords = vector3(scene.coords.x, scene.coords.y, scene.coords.z)
             local dist = #(playerCoords - sceneCoords)
-
             if dist <= scene.radius then
                 inScene = true
                 break
@@ -113,27 +109,58 @@ CreateThread(function()
 
         if inScene then
             sleep = 0
+            wasInScene = true
+            local playerVeh = GetVehiclePedIsIn(ped, false)
+            
+            SetEntityAlpha(ped, 150, false)
+            if playerVeh ~= 0 then
+                SetEntityAlpha(playerVeh, 150, false)
+            end
+
+            if GetSelectedPedWeapon(ped) ~= `WEAPON_UNARMED` then
+                SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
+            end
+
+
+            local playerVeh = GetVehiclePedIsIn(ped, false)
+            local entityToCheck = (playerVeh ~= 0) and playerVeh or playerPed
+
+            for _, player in ipairs(GetActivePlayers()) do
+                local otherPed = GetPlayerPed(player)
+                if otherPed ~= ped then
+                    local otherVeh = GetVehiclePedIsIn(otherPed, false)
+                    local otherEntity = (otherVeh ~= 0) and otherVeh or otherPed
+                    
+                    SetEntityNoCollisionEntity(entityToCheck, otherEntity, true)
+                end
+            end
+            
+            for _, player in ipairs(GetActivePlayers()) do
+                local otherPed = GetPlayerPed(player)
+                if otherPed ~= ped then
+                    SetEntityNoCollisionEntity(ped, otherPed, true)
+                end
+            end
+            
             drawScreenText(AxionStaffSceneConfig.ScreenText)
 
-            -- Disable combat and weapon controls
-            DisableControlAction(0, 24, true) -- Left Click / Attack
-            DisableControlAction(0, 25, true) -- Right Click / Aim
-            DisableControlAction(0, 47, true) -- G / Weapon Special (Grenades)
-            DisableControlAction(0, 58, true) -- G / Aiming / Throwing
-            DisableControlAction(0, 140, true) -- R / Light Melee
-            DisableControlAction(0, 141, true) -- Q / Heavy Melee
-            DisableControlAction(0, 142, true) -- Left Click / Melee Attack
-            DisableControlAction(0, 257, true) -- Fire (Vehicle/Foot)
-            DisableControlAction(0, 263, true) -- Melee Attack 1
-            DisableControlAction(0, 264, true) -- Melee Attack 2
+            DisableControlAction(0, 24, true) 
+            DisableControlAction(0, 25, true) 
+            DisableControlAction(0, 47, true) 
+            DisableControlAction(0, 58, true) 
+            DisableControlAction(0, 140, true) 
+            DisableControlAction(0, 141, true) 
+            DisableControlAction(0, 142, true) 
+            DisableControlAction(0, 257, true) 
+            DisableControlAction(0, 263, true) 
+            DisableControlAction(0, 264, true) 
 
-            -- Disable player firing altogether
             if IsPedArmed(ped, 6) then
                 DisablePlayerFiring(ped, true)
             end
 
-            if IsDisabledControlPressed(0, 24) or IsDisabledControlPressed(0, 25) or IsDisabledControlPressed(0, 47) or IsDisabledControlPressed(0, 58) or IsDisabledControlPressed(0, 140) or IsDisabledControlPressed(0, 141) or IsDisabledControlPressed(0, 142) or IsDisabledControlPressed(0, 257) or IsDisabledControlPressed(0, 263) or IsDisabledControlPressed(0, 264) then
-                if (msgTimer) then
+            if IsDisabledControlPressed(0, 24) or IsDisabledControlPressed(0, 25) or IsDisabledControlPressed(0, 140) then
+                if msgTimer then
                     if AxionStaffSceneConfig.NotificationType == 'axionnotification' and GetResourceState('AxionNotifications') == 'started' then
                         exports['AxionNotifications']:Notify('You cannot use weapons in a staff scene area.', 'error', 5000)
                     else
@@ -143,13 +170,36 @@ CreateThread(function()
                         })
                     end
                     msgTimer = false
-                    SetTimeout(5000, function()
-                        msgTimer = true
-                    end)
+                    SetTimeout(5000, function() msgTimer = true end)
                 end
             end
+
+            SetEntityInvincible(ped, true)
+            SetEntityProofs(ped, true, true, true, true, true, true, true, true)
+            SetBlockingOfNonTemporaryEvents(ped, true)
+            SetPedCanRagdoll(ped, false)
+            SetEntityHealth(ped, 200)
+            SetEntityMaxHealth(ped, 200)
+        else 
+            if wasInScene then
+                SetEntityInvincible(ped, false)
+                SetEntityProofs(ped, false, false, false, false, false, false, false, false)
+                SetBlockingOfNonTemporaryEvents(ped, false)
+                SetPedCanRagdoll(ped, true)
+                wasInScene = false -- Reset the state
+            end
+            sleep = 500
         end
 
         Wait(sleep)
+    end
+end)
+
+-- Ensures that pvp is always reenabled.
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1000)
+        NetworkSetFriendlyFireOption(true)
+        SetCanAttackFriendly(GetPlayerPed(-1), true, false)
     end
 end)
