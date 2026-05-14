@@ -84,6 +84,7 @@ CreateThread(function()
     while true do
         local sleep = 500
         local ped = PlayerPedId()
+            local playerVeh = GetVehiclePedIsIn(ped, false)
         local playerCoords = GetEntityCoords(ped)
         local inScene = false
 
@@ -110,7 +111,6 @@ CreateThread(function()
         if inScene then
             sleep = 0
             wasInScene = true
-            local playerVeh = GetVehiclePedIsIn(ped, false)
             
             SetEntityAlpha(ped, 150, false)
             if playerVeh ~= 0 then
@@ -123,7 +123,7 @@ CreateThread(function()
 
 
             local playerVeh = GetVehiclePedIsIn(ped, false)
-            local entityToCheck = (playerVeh ~= 0) and playerVeh or playerPed
+            local entityToCheck = (playerVeh ~= 0) and playerVeh or PlayerPedId()
 
             for _, player in ipairs(GetActivePlayers()) do
                 local otherPed = GetPlayerPed(player)
@@ -183,6 +183,7 @@ CreateThread(function()
         else 
             if wasInScene then
                 ResetEntityAlpha(ped)
+                ResetEntityAlpha(playerVeh)
                 SetEntityInvincible(ped, false)
                 SetEntityProofs(ped, false, false, false, false, false, false, false, false)
                 SetBlockingOfNonTemporaryEvents(ped, false)

@@ -4,7 +4,7 @@ game 'gta5'
 name 'AxionStaffScene'
 author 'AxionDevelopment | SpunkyDunkie'
 description 'Axion Staff Scene'
-version '1.0.0'
+version '1.1.0'
 
 lua54 'yes'
 
